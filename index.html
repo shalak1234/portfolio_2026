@@ -1019,5 +1019,45 @@
   update();
 })();
 </script>
+<script>
+/* Scroll / swipe / keys on the landing page play the same slide as "Recent Work" */
+(function () {
+  var body = document.body, landing = document.querySelector('.landing'), work = document.querySelector('.work');
+  var openBtn = document.querySelector('.btn');
+  var LOCK_MS = 1200;            // slide (900ms) + a little, so trackpad momentum can't double-fire
+  var lockedUntil = 0, acc = 0, accTimer = null;
+  function onLanding() { return !body.classList.contains('at-work') && !body.classList.contains('at-case'); }
+  function go() {
+    if (Date.now() < lockedUntil || !onLanding()) return;
+    lockedUntil = Date.now() + LOCK_MS; acc = 0;
+    openBtn.click();             // reuse the exact same transition + history behaviour
+  }
+  // mouse wheel / trackpad: add up small deltas so a gentle two-finger scroll still counts
+  window.addEventListener('wheel', function (e) {
+    if (onLanding()) {
+      e.preventDefault();
+      if (e.deltaY > 0) { acc += e.deltaY; clearTimeout(accTimer); accTimer = setTimeout(function () { acc = 0; }, 200); if (acc > 30) go(); }
+      return;
+    }
+    // just arrived: swallow leftover momentum so the content page doesn't jump
+    if (Date.now() < lockedUntil) e.preventDefault();
+  }, { passive: false });
+  // touch: swipe up on the landing page
+  var startY = null;
+  landing.addEventListener('touchstart', function (e) { startY = e.touches[0].clientY; }, { passive: true });
+  landing.addEventListener('touchmove', function (e) {
+    if (startY === null || !onLanding()) return;
+    if (startY - e.touches[0].clientY > 40) { startY = null; go(); }
+  }, { passive: true });
+  landing.addEventListener('touchend', function () { startY = null; }, { passive: true });
+  work.addEventListener('touchmove', function (e) { if (Date.now() < lockedUntil) e.preventDefault(); }, { passive: false });
+  // keyboard
+  document.addEventListener('keydown', function (e) {
+    if (!onLanding()) return;
+    if (e.target.closest && e.target.closest('input, textarea, [contenteditable]')) return;
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A')) { e.preventDefault(); go(); }
+  });
+})();
+</script>
 </body>
 </html>
