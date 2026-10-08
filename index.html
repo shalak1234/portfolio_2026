@@ -46,6 +46,7 @@
     transition: transform var(--fold-time) var(--fold-ease);
   }
   body.at-work .track { transform: translateY(-50%); }
+  body.no-anim .track, body.no-anim .case-page { transition: none !important; }
   .fold { height: 50%; overflow: hidden; }
   .landing {
     display: grid;
@@ -826,6 +827,30 @@
   });
   // Keep the real document from ever scrolling (focus can nudge it)
   window.addEventListener('scroll', function () { window.scrollTo(0, 0); });
+  // The browser jumps to #recent-work / #case-flowstate on load or refresh by scrolling these
+  // clipped containers, which shoves the layout out of place and leaves the visible page inert.
+  // Pin them at 0 so only our transforms ever move anything.
+  [document.querySelector('.viewport'), track, landing].forEach(function (el) {
+    el.addEventListener('scroll', function () { if (el.scrollTop || el.scrollLeft) { el.scrollTop = 0; el.scrollLeft = 0; } });
+    el.scrollTop = 0; el.scrollLeft = 0;
+  });
+  try { history.scrollRestoration = 'manual'; } catch (e) {}
+
+  // Refresh / open a link straight to the content page or the case study: show it immediately
+  // (no slide), and put the landing page underneath in history so Back still goes there.
+  (function restore() {
+    var h = location.hash;
+    if (h !== '#recent-work' && h !== '#case-flowstate') return;
+    body.classList.add('no-anim');
+    try {
+      history.replaceState(null, '', location.pathname + location.search);
+      history.pushState({ fold: 'work' }, '', '#recent-work');
+      if (h === '#case-flowstate') history.pushState({ fold: 'case' }, '', '#case-flowstate');
+    } catch (e) {}
+    show(true, true);
+    if (h === '#case-flowstate') showCase(true, true);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { body.classList.remove('no-anim'); }); });
+  })();
 })();
 </script>
 <script>
