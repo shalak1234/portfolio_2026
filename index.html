@@ -54,17 +54,23 @@
   }
   .landing:focus { outline: none; }
   .landing { position: relative; }
-  /* Quiet hint that there's more below */
+  /* Quiet hint that there's more below; also a button (44px tap area, arrow stays 16px) */
   .scroll-hint {
     position: absolute;
     left: 50%;
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
-    width: 16px; height: 16px;
-    margin-left: -8px;
+    bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+    width: 44px; height: 44px;
+    margin-left: -22px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0; border: 0; background: none;
     color: var(--fg);
-    pointer-events: none;
-    animation: hint-bob 2.4s ease-in-out infinite;
+    cursor: pointer;
+    border-radius: 12px;
+    -webkit-tap-highlight-color: transparent;
   }
+  .scroll-hint svg { width: 16px; height: 16px; display: block; animation: hint-bob 2.4s ease-in-out infinite; }
+  .scroll-hint:focus { outline: none; }
+  .scroll-hint:focus-visible { outline: 2px solid var(--fg); outline-offset: 0; }
   @keyframes hint-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
   .hero {
     display: block;
@@ -302,7 +308,8 @@
   .to-top:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
   @media (max-width: 560px) {
     body { font-size: 12px; }
-    .scroll-hint { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); width: 14px; height: 14px; margin-left: -7px; }
+    .scroll-hint { bottom: calc(81px + env(safe-area-inset-bottom, 0px)); }
+    .scroll-hint svg { width: 14px; height: 14px; }
     .hero { width: 100%; }
     .btn { height: 32px; gap: 10px; padding: 0 10px 0 11px; }
     .btn .arrow { width: 12px; height: 12px; }
@@ -480,7 +487,7 @@
 </clipPath>
 </defs>
 </svg>
-<svg class="scroll-hint" viewBox="954 718 14 14" fill="none" aria-hidden="true"><path d="M961 719.617V731.284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M966.833 725.453L960.999 731.286L955.166 725.453" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<button class="scroll-hint" type="button" aria-label="See recent work"><svg viewBox="954 718 14 14" fill="none" aria-hidden="true"><path d="M961 719.617V731.284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M966.833 725.453L960.999 731.286L955.166 725.453" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 </main>
 <section class="work fold" id="recent-work" aria-label="Recent work" inert>
   <header class="work-header">
@@ -835,6 +842,7 @@
   caseBack.addEventListener('click', function () { showCase(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && body.classList.contains('at-case')) showCase(false); });
   window.__openWork = function () { show(true); };
+  document.querySelector('.scroll-hint').addEventListener('click', function () { show(true); });
   backBtn.addEventListener('click', function () { show(false); });
   window.addEventListener('popstate', function () {
     var h = location.hash;
