@@ -958,10 +958,8 @@
   var body = document.body, landing = document.querySelector('.landing'), work = document.querySelector('.work');
   var LOCK_MS = 1200;            // slide (900ms) + a little, so trackpad momentum can't double-fire
   var lockedUntil = 0, acc = 0, accTimer = null;
-  var IDLE_MS = 500;             // the wheel must go completely still this long at the top before "back" arms
-  var BACK_PX = 80;              // ...and then a definite swipe up of at least this much
-  var lastWheel = 0, armed = false, upAcc = 0;
-  function px(e) { return e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * innerHeight : e.deltaY; }
+  var GAP_MS = 200;              // a pause this long between wheel events = a new scroll
+  var lastWheel = 0, gestureFromTop = false, upAcc = 0, upTimer = null;
   var lightbox = document.querySelector('.lightbox');
   function onContentTop() {
     return body.classList.contains('at-work') && !body.classList.contains('at-case') && !(lightbox && !lightbox.hidden);
@@ -981,24 +979,22 @@
   window.addEventListener('wheel', function (e) {
     if (onLanding()) {
       e.preventDefault();
-      var dy = px(e); if (dy > 0) { acc += dy; clearTimeout(accTimer); accTimer = setTimeout(function () { acc = 0; }, 200); if (acc > 30) go(); }
+      if (e.deltaY > 0) { acc += e.deltaY; clearTimeout(accTimer); accTimer = setTimeout(function () { acc = 0; }, 200); if (acc > 30) go(); }
       return;
     }
     // just arrived: swallow leftover momentum so the content page doesn't jump
     if (Date.now() < lockedUntil) { e.preventDefault(); lastWheel = Date.now(); return; }
-    var now = Date.now(), idle = now - lastWheel;
+    if (!onContentTop() || e.ctrlKey) { lastWheel = Date.now(); return; }
+    // content page: a NEW upward scroll that starts while already at the top goes back.
+    // The scroll that brings you to the top (and its momentum) never counts.
+    var now = Date.now();
+    if (now - lastWheel > GAP_MS) gestureFromTop = work.scrollTop <= 0;
     lastWheel = now;
-    if (!onContentTop() || e.ctrlKey || work.scrollTop > 0) { armed = false; return; }
-    // At the top of the content page. Trackpad momentum keeps sending events, so "back" only
-    // arms after the wheel has been completely still for IDLE_MS; the scroll (and momentum)
-    // that brought you to the top can never count. Then it needs a definite swipe up.
-    if (!armed && idle >= IDLE_MS) { armed = true; upAcc = 0; }
-    var dy = px(e);
-    if (armed && dy < 0) {
+    if (gestureFromTop && work.scrollTop <= 0 && e.deltaY < 0) {
       e.preventDefault();
-      upAcc -= dy;
-      if (upAcc >= BACK_PX) { armed = false; back(); }
-    } else if (dy > 0) armed = false;
+      upAcc -= e.deltaY; clearTimeout(upTimer); upTimer = setTimeout(function () { upAcc = 0; }, 200);
+      if (upAcc > 30) back();
+    }
   }, { passive: false });
   // touch: swipe up on the landing page
   var startY = null;
