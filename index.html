@@ -36,7 +36,7 @@
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
-  /* Graphic stays in the exact centre of the screen; text sits below it */
+  /* Landing: just the graphic, dead centre of the screen */
   /* Two folds stacked in a screen-sized window; no real scrolling.
      The "scroll" is the track sliding up by one screen. */
   html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
@@ -49,36 +49,15 @@
   .fold { height: 50%; overflow: hidden; }
   .landing {
     display: grid;
-    grid-template-rows: 1fr auto 1fr;
-    justify-items: center;
+    place-items: center;
     padding: 16px;
   }
+  .landing:focus { outline: none; }
   .hero {
-    grid-row: 2;
     display: block;
     width: min(480px, 75%);
     height: auto;
   }
-  .below {
-    grid-row: 3;
-    align-self: start;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding-top: 78px;
-    gap: 32px;
-  }
-  .intro { margin: 0; }
-  .intro span { display: block; }
-  .cta {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .cta p { margin: 0; }
   .btn {
     display: inline-flex;
     align-items: center;
@@ -309,14 +288,8 @@
   .to-top:hover { background: var(--fg); color: var(--bg); }
   .to-top:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
   @media (max-width: 560px) {
-    .below { padding-top: 80px; gap: 24px; }
     body { font-size: 12px; }
     .hero { width: 100%; }
-    /* Phones: centre the whole group (graphic + text), not just the graphic */
-    .landing { grid-template-rows: auto auto; align-content: center; }
-    .hero { grid-row: 1; }
-    .below { grid-row: 2; }
-    .cta { flex-direction: column; gap: 16px; }
     .btn { height: 32px; gap: 10px; padding: 0 10px 0 11px; }
     .btn .arrow { width: 12px; height: 12px; }
     .btn .label { transform: translateY(-0.7px); }
@@ -341,7 +314,7 @@
 <body>
 <div class="viewport">
 <div class="track">
-<main class="landing fold" id="top">
+<main class="landing fold" id="top" tabindex="-1">
 <svg class="hero" role="img" aria-label="Shalak Bhavsar, Product Designer" viewBox="0 0 448 142" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M105.622 44.2529C100.782 44.2529 98.4355 42.1262 98.4355 38.4106H101.662C101.931 40.7084 102.982 41.7595 105.696 41.7595C108.336 41.7595 109.485 40.6351 109.485 39.0217C109.485 37.8239 108.825 37.0417 106.16 36.6506L103.936 36.3328C100.293 35.8195 98.8756 34.5483 98.8756 31.7128C98.8756 28.5838 101.1 26.3594 105.622 26.3594C110.145 26.3594 112.369 28.5594 112.369 31.9572H109.216C108.996 29.9039 107.871 28.8527 105.549 28.8527C103.227 28.8527 102.2 29.9283 102.2 31.5172C102.2 32.715 102.762 33.3261 105.085 33.6439L107.309 33.9617C110.853 34.475 112.809 35.8195 112.809 38.8262C112.809 42.0773 110.462 44.2529 105.622 44.2529Z" fill="white"/>
 <path d="M128.957 44.0084H125.633V36.5528H117.395V44.0084H114.07V26.6038H117.395V33.7172H125.633V26.6038H128.957V44.0084Z" fill="white"/>
@@ -493,18 +466,6 @@
 </clipPath>
 </defs>
 </svg>
-<div class="below">
-  <p class="intro">
-    <span>Built products for Healthcare, Automotive,</span>
-    <span>Cyber Security, and Ed-Tech. in the last 2.5 years.</span>
-  </p>
-  <div class="cta">
-    <p>Now I build products with distinct personalities</p>
-    <a class="btn" href="#recent-work"><span class="label" data-text="Recent Work">Recent Work</span>
-      <svg class="arrow" width="14" height="14" viewBox="954 718 14 14" fill="none" aria-hidden="true"><path d="M961 719.617V731.284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M966.833 725.453L960.999 731.286L955.166 725.453" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
-  </div>
-</div>
 </main>
 <section class="work fold" id="recent-work" aria-label="Recent work" inert>
   <header class="work-header">
@@ -813,7 +774,6 @@
   var body = document.body;
   var landing = document.querySelector('.landing');
   var work = document.querySelector('.work');
-  var openBtn = document.querySelector('.btn');
   var backBtn = document.querySelector('.back-mark');
   var track = document.querySelector('.track');
 
@@ -839,7 +799,7 @@
         else history.replaceState(null, '', location.pathname + location.search);
       } catch (e) {}
     }
-    afterSlide(track, atWork ? backBtn : openBtn);
+    afterSlide(track, atWork ? backBtn : landing);
   }
 
   function showCase(open, fromHistory) {
@@ -859,7 +819,7 @@
   caseLink.addEventListener('click', function (e) { e.preventDefault(); showCase(true); });
   caseBack.addEventListener('click', function () { showCase(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && body.classList.contains('at-case')) showCase(false); });
-  openBtn.addEventListener('click', function (e) { e.preventDefault(); show(true); });
+  window.__openWork = function () { show(true); };
   backBtn.addEventListener('click', function () { show(false); });
   window.addEventListener('popstate', function () {
     var h = location.hash;
@@ -1023,14 +983,13 @@
 /* Scroll / swipe / keys on the landing page play the same slide as "Recent Work" */
 (function () {
   var body = document.body, landing = document.querySelector('.landing'), work = document.querySelector('.work');
-  var openBtn = document.querySelector('.btn');
   var LOCK_MS = 1200;            // slide (900ms) + a little, so trackpad momentum can't double-fire
   var lockedUntil = 0, acc = 0, accTimer = null;
   function onLanding() { return !body.classList.contains('at-work') && !body.classList.contains('at-case'); }
   function go() {
     if (Date.now() < lockedUntil || !onLanding()) return;
     lockedUntil = Date.now() + LOCK_MS; acc = 0;
-    openBtn.click();             // reuse the exact same transition + history behaviour
+    window.__openWork();             // reuse the exact same transition + history behaviour
   }
   // mouse wheel / trackpad: add up small deltas so a gentle two-finger scroll still counts
   window.addEventListener('wheel', function (e) {
