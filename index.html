@@ -53,6 +53,20 @@
     padding: 16px;
   }
   .landing:focus { outline: none; }
+  .landing { position: relative; }
+  /* Quiet hint that there's more below */
+  .scroll-hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+    width: 16px; height: 16px;
+    margin-left: -8px;
+    color: var(--fg);
+    opacity: .35;
+    pointer-events: none;
+    animation: hint-bob 2.4s ease-in-out infinite;
+  }
+  @keyframes hint-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
   .hero {
     display: block;
     width: min(480px, 75%);
@@ -289,6 +303,7 @@
   .to-top:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
   @media (max-width: 560px) {
     body { font-size: 12px; }
+    .scroll-hint { bottom: calc(24px + env(safe-area-inset-bottom, 0px)); width: 14px; height: 14px; margin-left: -7px; }
     .hero { width: 100%; }
     .btn { height: 32px; gap: 10px; padding: 0 10px 0 11px; }
     .btn .arrow { width: 12px; height: 12px; }
@@ -466,6 +481,7 @@
 </clipPath>
 </defs>
 </svg>
+<svg class="scroll-hint" viewBox="954 718 14 14" fill="none" aria-hidden="true"><path d="M961 719.617V731.284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M966.833 725.453L960.999 731.286L955.166 725.453" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </main>
 <section class="work fold" id="recent-work" aria-label="Recent work" inert>
   <header class="work-header">
