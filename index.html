@@ -163,10 +163,10 @@
     font-size: 12px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    opacity: 0.6;
+    color: rgba(255, 255, 255, 0.6); /* was opacity .6: same look, but lets the link go fully white */
   }
-  .label-link { color: inherit; text-decoration: none; }
-  .label-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .label-link { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .label-link:hover { color: #ffffff; }
   /* Case study */
   .case {
     display: block;
