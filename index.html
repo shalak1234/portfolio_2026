@@ -62,7 +62,10 @@
     padding: 0; border: 0; background: none;
     color: var(--fg);
     pointer-events: none;
+    transition: opacity .2s ease;
   }
+  /* gone on the same trigger as the header fading in */
+  body.header-on .scroll-hint { opacity: 0; }
   .scroll-hint svg { width: 16px; height: 16px; display: block; animation: hint-bob 2.4s ease-in-out infinite; }
   .scroll-hint:focus { outline: none; }
   .scroll-hint:focus-visible { outline: 2px solid var(--fg); outline-offset: 0; }
