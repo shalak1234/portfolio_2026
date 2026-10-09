@@ -37,26 +37,21 @@
     overflow-x: hidden;
   }
   /* Landing: just the graphic, dead centre of the screen */
-  /* Two folds stacked in a screen-sized window; no real scrolling.
-     The "scroll" is the track sliding up by one screen. */
-  html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
-  .viewport { position: fixed; inset: 0; overflow: hidden; }
-  .track {
-    height: 200%;
-    transition: transform var(--fold-time) var(--fold-ease);
-  }
-  body.at-work .track { transform: translateY(-50%); }
-  body.no-anim .track, body.no-anim .case-page { transition: none !important; }
-  .fold { height: 50%; overflow: hidden; }
+  /* Regular page scroll: the landing is one full screen, the content page follows below it */
+  body.at-case { overflow: hidden; }
+  body.no-anim .track, body.no-anim .case-page, body.no-anim .work-header { transition: none !important; }
   .landing {
     display: grid;
     place-items: center;
     padding: 16px;
+    box-sizing: border-box;
+    min-height: 100vh;
+    min-height: 100svh;
   }
   /* No focus outlines anywhere (keyboard rings intentionally off) */
   *:focus, *:focus-visible { outline: none !important; }
   .landing { position: relative; }
-  /* Quiet hint that there's more below; also a button (44px tap area, arrow stays 16px) */
+  /* Quiet hint that there's more below (decoration only) */
   .scroll-hint {
     position: absolute;
     left: 50%;
@@ -66,9 +61,7 @@
     display: flex; align-items: center; justify-content: center;
     padding: 0; border: 0; background: none;
     color: var(--fg);
-    cursor: pointer;
-    border-radius: 12px;
-    -webkit-tap-highlight-color: transparent;
+    pointer-events: none;
   }
   .scroll-hint svg { width: 16px; height: 16px; display: block; animation: hint-bob 2.4s ease-in-out infinite; }
   .scroll-hint:focus { outline: none; }
@@ -120,8 +113,10 @@
   .work { position: relative; background: var(--page2); }
   /* Back control: the graphic at half the landing size, in navy */
   .work-header {
-    /* stays at the top while the content page scrolls */
-    position: sticky; top: 0; z-index: 3;
+    /* hidden until the landing graphic leaves the top edge, then fades in and stays pinned to the top */
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1;
+    opacity: 0; visibility: hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s, transform var(--fold-time) var(--fold-ease), filter var(--fold-time) var(--fold-ease);
     background: var(--page2);
     padding-bottom: 16px !important;
     display: flex;
@@ -131,6 +126,8 @@
     gap: 16px 24px;
     padding: 24px 24px 0;
   }
+  body.header-on .work-header { opacity: 1; visibility: visible; transition: opacity .2s ease, visibility 0s, transform var(--fold-time) var(--fold-ease), filter var(--fold-time) var(--fold-ease); }
+  .work { padding-top: var(--hh, 96px); min-height: 100vh; box-sizing: border-box; }
   .ext-links { display: flex; gap: 14px; padding-top: 4px; }
   /* Same squircle button as Recent Work, at the Figma spec: 36px tall, 13px text, 16px icon */
   .btn.ext-btn {
@@ -159,7 +156,6 @@
   .back-mark .mark { display: block; width: 100%; height: auto; }
   .back-mark:focus-visible { outline: 2px solid var(--fg); outline-offset: 6px; border-radius: 4px; }
   /* Content page: one scrolling column (scrolls inside the fold, the page itself never scrolls) */
-  .work { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
   .content {
     width: min(720px, 100%);
     margin: 0 auto;
@@ -253,7 +249,7 @@
   .track { transition: transform var(--fold-time) var(--fold-ease), filter var(--fold-time) var(--fold-ease); }
   body.at-case .case-page { transform: translateX(0); }
   /* the content page drifts left a little underneath, like opening a detail view */
-  body.at-work.at-case .track { transform: translateY(-50%) translateX(-24%); filter: brightness(0.7); }
+  body.at-case .track, body.at-case .work-header { transform: translateX(-24%); filter: brightness(0.7); }
   .case-back {
     position: sticky; top: 24px; left: 24px;
     margin: 24px 0 0 24px;
@@ -364,9 +360,38 @@
 </style>
 </head>
 <body>
+  <header class="work-header">
+<button class="back-mark" type="button" aria-label="Back to top">
+<svg class="mark" aria-hidden="true" focusable="false" viewBox="0 0 337 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M105.622 44.2529C100.782 44.2529 98.4355 42.1262 98.4355 38.4106H101.662C101.931 40.7084 102.982 41.7595 105.696 41.7595C108.336 41.7595 109.485 40.6351 109.485 39.0217C109.485 37.8239 108.825 37.0417 106.16 36.6506L103.936 36.3328C100.293 35.8195 98.8755 34.5483 98.8755 31.7128C98.8755 28.5838 101.1 26.3594 105.622 26.3594C110.145 26.3594 112.369 28.5594 112.369 31.9572H109.216C108.996 29.9039 107.871 28.8527 105.549 28.8527C103.227 28.8527 102.2 29.9283 102.2 31.5172C102.2 32.715 102.762 33.3261 105.085 33.6439L107.309 33.9617C110.853 34.475 112.809 35.8195 112.809 38.8262C112.809 42.0773 110.462 44.2529 105.622 44.2529Z" fill="white"/>
+<path d="M128.957 44.0084H125.633V36.5528H117.395V44.0084H114.07V26.6038H117.395V33.7172H125.633V26.6038H128.957V44.0084Z" fill="white"/>
+<path d="M146.796 44.0084H143.373L142.053 40.3906H134.476L133.156 44.0084H129.733L136.211 26.6038H140.318L146.796 44.0084ZM141.222 37.8239L138.265 29.635L135.282 37.8239H141.222Z" fill="white"/>
+<path d="M159.236 44.0084H147.576V26.6038H150.9V41.2951H159.236V44.0084Z" fill="white"/>
+<path d="M176.577 44.0084H173.155L171.835 40.3906H164.257L162.937 44.0084H159.515L165.993 26.6038H170.099L176.577 44.0084ZM171.004 37.8239L168.046 29.635L165.064 37.8239H171.004Z" fill="white"/>
+<path d="M192.146 44.0084H188.26L182.955 36.2595L180.56 38.7773V44.0084H177.235V26.6038H180.56V34.7683L188.015 26.6038H191.902L185.131 33.7906L192.146 44.0084Z" fill="white"/>
+<path d="M212.9 39.1928C212.9 41.9795 210.846 44.0084 207.131 44.0084H198.306V26.6038H206.642C210.357 26.6038 212.411 28.4616 212.411 31.2483C212.411 33.155 211.457 34.5972 209.502 35.0617C211.775 35.5017 212.9 37.115 212.9 39.1928ZM209.575 38.9484C209.575 37.3839 208.622 36.3573 206.764 36.3573H201.631V41.5151H206.764C208.622 41.5151 209.575 40.5129 209.575 38.9484ZM209.086 31.5172C209.086 29.9527 208.133 29.0972 206.275 29.0972H201.631V33.9128H206.275C208.133 33.9128 209.086 33.0817 209.086 31.5172Z" fill="white"/>
+<path d="M229.051 44.0084H225.726V36.5528H217.488V44.0084H214.164V26.6038H217.488V33.7172H225.726V26.6038H229.051V44.0084Z" fill="white"/>
+<path d="M246.889 44.0084H243.467L242.147 40.3906H234.569L233.249 44.0084H229.827L236.305 26.6038H240.411L246.889 44.0084ZM241.316 37.8239L238.358 29.635L235.376 37.8239H241.316Z" fill="white"/>
+<path d="M254.622 44.0084H250.515L244.037 26.6038H247.606L252.568 40.6595L257.531 26.6038H261.099L254.622 44.0084Z" fill="white"/>
+<path d="M267.546 44.2529C262.706 44.2529 260.36 42.1262 260.36 38.4106H263.586C263.855 40.7084 264.906 41.7595 267.62 41.7595C270.26 41.7595 271.409 40.6351 271.409 39.0217C271.409 37.8239 270.749 37.0417 268.084 36.6506L265.86 36.3328C262.217 35.8195 260.8 34.5483 260.8 31.7128C260.8 28.5838 263.024 26.3594 267.546 26.3594C272.069 26.3594 274.293 28.5594 274.293 31.9572H271.14C270.92 29.9039 269.795 28.8527 267.473 28.8527C265.151 28.8527 264.124 29.9283 264.124 31.5172C264.124 32.715 264.686 33.3261 267.009 33.6439L269.233 33.9617C272.778 34.475 274.733 35.8195 274.733 38.8262C274.733 42.0773 272.386 44.2529 267.546 44.2529Z" fill="white"/>
+<path d="M291.549 44.0084H288.127L286.807 40.3906H279.229L277.909 44.0084H274.487L280.965 26.6038H285.072L291.549 44.0084ZM285.976 37.8239L283.018 29.635L280.036 37.8239H285.976Z" fill="white"/>
+<path d="M306.19 31.5661C306.19 33.7661 305.09 35.2572 303.085 35.8439C304.967 36.2595 305.945 37.5795 305.945 39.5106V42.2484C305.945 42.9818 306.043 43.5929 306.19 44.0084H303.012C302.792 43.544 302.621 43.0062 302.621 42.2484V39.6328C302.621 37.4817 301.325 36.9684 299.614 36.9684H295.654V44.0084H292.329V26.6038H300.421C304.136 26.6038 306.19 28.535 306.19 31.5661ZM302.865 31.7861C302.865 30.1483 302.01 29.0972 300.054 29.0972H295.654V34.475H300.054C302.01 34.475 302.865 33.4239 302.865 31.7861Z" fill="white"/>
+<path d="M42.0687 35.7052C42.0687 47.3216 32.6513 56.7386 21.0344 56.7386C9.4174 56.7386 0 47.3216 0 35.7052C0 24.0888 9.4174 14.6719 21.0344 14.6719C32.6513 14.6719 42.0687 24.0888 42.0687 35.7052Z" fill="white"/>
+<path d="M64.1572 35.7052C64.1572 47.3216 58.1928 56.7386 50.8354 56.7386C43.478 56.7386 37.5137 47.3216 37.5137 35.7052C37.5137 24.0888 43.478 14.6719 50.8354 14.6719C58.1928 14.6719 64.1572 24.0888 64.1572 35.7052Z" fill="white"/>
+<path d="M76.7631 35.7052C76.7631 47.3216 73.467 56.7386 69.4011 56.7386C65.3352 56.7386 62.0391 47.3216 62.0391 35.7052C62.0391 24.0888 65.3352 14.6719 69.4011 14.6719C73.467 14.6719 76.7631 24.0888 76.7631 35.7052Z" fill="white"/>
+<path d="M83.0915 35.7052C83.0915 47.3216 81.208 56.7386 78.8846 56.7386C76.5612 56.7386 74.6777 47.3216 74.6777 35.7052C74.6777 24.0888 76.5612 14.6719 78.8846 14.6719C81.208 14.6719 83.0915 24.0888 83.0915 35.7052Z" fill="white"/>
+<path d="M325.112 13.4446C325.112 15.4696 326.754 17.1113 328.779 17.1113H335.501C335.839 17.1113 336.112 17.3849 336.112 17.7224C336.112 18.0599 335.839 18.3335 335.501 18.3335H328.779C326.754 18.3335 325.112 19.9752 325.112 22.0002V29.9447C325.112 30.2823 324.839 30.5559 324.501 30.5559C324.164 30.5559 323.89 30.2823 323.89 29.9447V22.0002C323.89 19.9752 322.249 18.3335 320.223 18.3335H312.279C311.941 18.3335 311.668 18.0599 311.668 17.7224C311.668 17.3849 311.941 17.1113 312.279 17.1113H320.223C322.249 17.1113 323.89 15.4696 323.89 13.4446V6.72229C323.89 6.38478 324.164 6.11117 324.501 6.11117C324.839 6.11117 325.112 6.38478 325.112 6.72229V13.4446Z" fill="white"/>
+<path d="M319.001 7.33341C319.001 9.35847 320.643 11.0001 322.668 11.0001H329.39C329.728 11.0001 330.001 11.2737 330.001 11.6112C330.001 11.9487 329.728 12.2223 329.39 12.2223H322.668C320.643 12.2223 319.001 13.864 319.001 15.889V23.8336C319.001 24.1711 318.728 24.4447 318.39 24.4447C318.053 24.4447 317.779 24.1711 317.779 23.8336V15.889C317.779 13.864 316.137 12.2223 314.112 12.2223H306.168C305.83 12.2223 305.557 11.9487 305.557 11.6112C305.557 11.2737 305.83 11.0001 306.168 11.0001H314.112C316.137 11.0001 317.779 9.35847 317.779 7.33341V0.611118C317.779 0.273607 318.053 0 318.39 0C318.728 0 319.001 0.273607 319.001 0.611117V7.33341Z" fill="white"/>
+</svg>
+</button>
+  <nav class="ext-links" aria-label="Links">
+    <a class="btn ext-btn" data-radius="7" href="https://drive.google.com/file/d/1VuHewja-pZzO5sXbg2FBLyKbe5iAdyyB/view" target="_blank" rel="noopener noreferrer"><span class="label" data-text="Resume">Resume</span><svg class="icon" width="20" height="20" viewBox="67 12 20 20" fill="none" aria-hidden="true"><path d="M72.0007 30.3307C71.5586 30.3307 71.1347 30.1551 70.8221 29.8426C70.5096 29.53 70.334 29.1061 70.334 28.6641V15.3307C70.334 14.8887 70.5096 14.4648 70.8221 14.1522C71.1347 13.8397 71.5586 13.6641 72.0007 13.6641H78.6673C78.9311 13.6636 79.1924 13.7154 79.4361 13.8164C79.6798 13.9173 79.9011 14.0655 80.0873 14.2524L83.0773 17.2424C83.2647 17.4287 83.4133 17.6502 83.5146 17.8942C83.6158 18.1382 83.6677 18.3999 83.6673 18.6641V28.6641C83.6673 29.1061 83.4917 29.53 83.1792 29.8426C82.8666 30.1551 82.4427 30.3307 82.0007 30.3307H72.0007Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M78.666 13.6641V17.8307C78.666 18.0517 78.7538 18.2637 78.9101 18.42C79.0664 18.5763 79.2783 18.6641 79.4993 18.6641H83.666" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M75.3327 19.5H73.666" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M80.3327 22.8359H73.666" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M80.3327 26.1641H73.666" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="badge" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#16264E"/><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" stroke="white"/><path d="M5.5 5.5H10.5V10.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10.5L10.5 5.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+    <a class="btn ext-btn" data-radius="7" href="https://shalak.framer.website/" target="_blank" rel="noopener noreferrer"><span class="label" data-text="Previous work">Previous work</span><svg class="icon" width="20" height="20" viewBox="104 12 20 20" fill="none" aria-hidden="true"><path d="M115.738 27.3399C115.583 27.4951 115.399 27.6183 115.197 27.7024C114.994 27.7865 114.777 27.8298 114.558 27.8299H108.166V21.4365C108.166 20.9945 108.342 20.5707 108.654 20.2582L113.791 15.1215C114.729 14.1833 116.002 13.6562 117.329 13.6562C118.655 13.6562 119.928 14.1833 120.866 15.1215C121.804 16.0597 122.331 17.3322 122.331 18.659C122.331 19.9859 121.804 21.2583 120.866 22.1965L115.738 27.3399Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M117.333 18.6641L105.666 30.3307" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M118.573 24.5H111.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="badge" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#16264E"/><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" stroke="white"/><path d="M5.5 5.5H10.5V10.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10.5L10.5 5.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+  </nav>
+</header>
 <div class="viewport">
 <div class="track">
-<main class="landing fold" id="top" tabindex="-1">
+<main class="landing" id="top" tabindex="-1">
 <div class="lockup" role="img" aria-label="Shalak Bhavsar, Product Designer. 3 years across healthcare, automotive, cyber security and ed-tech. Now building products with personality.">
 <svg class="lk-logo" aria-hidden="true" focusable="false" style="height:calc(var(--u) * 40)" viewBox="0 0 46 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M43.0059 0.5C42.9897 0.5 43.0305 0.490101 43.1318 0.59375C43.2339 0.698279 43.3569 0.879413 43.4883 1.15723C43.7499 1.71077 43.9991 2.54344 44.2129 3.6123C44.639 5.74287 44.9053 8.70894 44.9053 12C44.9053 15.2911 44.639 18.2571 44.2129 20.3877C43.9991 21.4566 43.7499 22.2892 43.4883 22.8428C43.3569 23.1206 43.2339 23.3017 43.1318 23.4062C43.0305 23.5099 42.9897 23.5 43.0059 23.5C43.0212 23.5001 42.9806 23.5093 42.8799 23.4062C42.7778 23.3018 42.6549 23.1208 42.5234 22.8428C42.2618 22.2892 42.0127 21.4566 41.7988 20.3877C41.3727 18.2571 41.1055 15.2911 41.1055 12C41.1055 8.70894 41.3727 5.74287 41.7988 3.6123C42.0127 2.54336 42.2618 1.71075 42.5234 1.15723C42.6549 0.879169 42.7778 0.698237 42.8799 0.59375C42.9806 0.490703 43.0212 0.499885 43.0059 0.5Z" fill="#16264E" stroke="white"/>
@@ -507,38 +532,9 @@
 <path d="M1 5.99532C1 4.03959 2.38391 2.34633 4.31238 2.02086C12.5979 0.622491 18.3747 0.690983 26.6475 2.04085C28.5935 2.35837 30 4.05931 30 6.03101V18.2389C30 20.2997 28.4656 22.0442 26.4193 22.2882C17.9938 23.2929 12.3123 23.5925 4.36221 22.4078C2.40972 22.1169 1 20.4114 1 18.4373V5.99532Z" stroke="white" stroke-width="2" mask="url(#path-1-outside-1_1108_26073)"/>
 </svg></div>
 </div>
-<button class="scroll-hint" type="button" aria-label="See recent work"><svg viewBox="954 718 14 14" fill="none" aria-hidden="true"><path d="M961 719.617V731.284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M966.833 725.453L960.999 731.286L955.166 725.453" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<div class="scroll-hint" aria-hidden="true"><svg viewBox="954 718 14 14" fill="none" aria-hidden="true"><path d="M961 719.617V731.284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M966.833 725.453L960.999 731.286L955.166 725.453" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
 </main>
-<section class="work fold" id="recent-work" aria-label="Recent work" tabindex="-1" inert>
-  <header class="work-header">
-<button class="back-mark" type="button" aria-label="Back to top">
-<svg class="mark" aria-hidden="true" focusable="false" viewBox="0 0 337 57" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M105.622 44.2529C100.782 44.2529 98.4355 42.1262 98.4355 38.4106H101.662C101.931 40.7084 102.982 41.7595 105.696 41.7595C108.336 41.7595 109.485 40.6351 109.485 39.0217C109.485 37.8239 108.825 37.0417 106.16 36.6506L103.936 36.3328C100.293 35.8195 98.8755 34.5483 98.8755 31.7128C98.8755 28.5838 101.1 26.3594 105.622 26.3594C110.145 26.3594 112.369 28.5594 112.369 31.9572H109.216C108.996 29.9039 107.871 28.8527 105.549 28.8527C103.227 28.8527 102.2 29.9283 102.2 31.5172C102.2 32.715 102.762 33.3261 105.085 33.6439L107.309 33.9617C110.853 34.475 112.809 35.8195 112.809 38.8262C112.809 42.0773 110.462 44.2529 105.622 44.2529Z" fill="white"/>
-<path d="M128.957 44.0084H125.633V36.5528H117.395V44.0084H114.07V26.6038H117.395V33.7172H125.633V26.6038H128.957V44.0084Z" fill="white"/>
-<path d="M146.796 44.0084H143.373L142.053 40.3906H134.476L133.156 44.0084H129.733L136.211 26.6038H140.318L146.796 44.0084ZM141.222 37.8239L138.265 29.635L135.282 37.8239H141.222Z" fill="white"/>
-<path d="M159.236 44.0084H147.576V26.6038H150.9V41.2951H159.236V44.0084Z" fill="white"/>
-<path d="M176.577 44.0084H173.155L171.835 40.3906H164.257L162.937 44.0084H159.515L165.993 26.6038H170.099L176.577 44.0084ZM171.004 37.8239L168.046 29.635L165.064 37.8239H171.004Z" fill="white"/>
-<path d="M192.146 44.0084H188.26L182.955 36.2595L180.56 38.7773V44.0084H177.235V26.6038H180.56V34.7683L188.015 26.6038H191.902L185.131 33.7906L192.146 44.0084Z" fill="white"/>
-<path d="M212.9 39.1928C212.9 41.9795 210.846 44.0084 207.131 44.0084H198.306V26.6038H206.642C210.357 26.6038 212.411 28.4616 212.411 31.2483C212.411 33.155 211.457 34.5972 209.502 35.0617C211.775 35.5017 212.9 37.115 212.9 39.1928ZM209.575 38.9484C209.575 37.3839 208.622 36.3573 206.764 36.3573H201.631V41.5151H206.764C208.622 41.5151 209.575 40.5129 209.575 38.9484ZM209.086 31.5172C209.086 29.9527 208.133 29.0972 206.275 29.0972H201.631V33.9128H206.275C208.133 33.9128 209.086 33.0817 209.086 31.5172Z" fill="white"/>
-<path d="M229.051 44.0084H225.726V36.5528H217.488V44.0084H214.164V26.6038H217.488V33.7172H225.726V26.6038H229.051V44.0084Z" fill="white"/>
-<path d="M246.889 44.0084H243.467L242.147 40.3906H234.569L233.249 44.0084H229.827L236.305 26.6038H240.411L246.889 44.0084ZM241.316 37.8239L238.358 29.635L235.376 37.8239H241.316Z" fill="white"/>
-<path d="M254.622 44.0084H250.515L244.037 26.6038H247.606L252.568 40.6595L257.531 26.6038H261.099L254.622 44.0084Z" fill="white"/>
-<path d="M267.546 44.2529C262.706 44.2529 260.36 42.1262 260.36 38.4106H263.586C263.855 40.7084 264.906 41.7595 267.62 41.7595C270.26 41.7595 271.409 40.6351 271.409 39.0217C271.409 37.8239 270.749 37.0417 268.084 36.6506L265.86 36.3328C262.217 35.8195 260.8 34.5483 260.8 31.7128C260.8 28.5838 263.024 26.3594 267.546 26.3594C272.069 26.3594 274.293 28.5594 274.293 31.9572H271.14C270.92 29.9039 269.795 28.8527 267.473 28.8527C265.151 28.8527 264.124 29.9283 264.124 31.5172C264.124 32.715 264.686 33.3261 267.009 33.6439L269.233 33.9617C272.778 34.475 274.733 35.8195 274.733 38.8262C274.733 42.0773 272.386 44.2529 267.546 44.2529Z" fill="white"/>
-<path d="M291.549 44.0084H288.127L286.807 40.3906H279.229L277.909 44.0084H274.487L280.965 26.6038H285.072L291.549 44.0084ZM285.976 37.8239L283.018 29.635L280.036 37.8239H285.976Z" fill="white"/>
-<path d="M306.19 31.5661C306.19 33.7661 305.09 35.2572 303.085 35.8439C304.967 36.2595 305.945 37.5795 305.945 39.5106V42.2484C305.945 42.9818 306.043 43.5929 306.19 44.0084H303.012C302.792 43.544 302.621 43.0062 302.621 42.2484V39.6328C302.621 37.4817 301.325 36.9684 299.614 36.9684H295.654V44.0084H292.329V26.6038H300.421C304.136 26.6038 306.19 28.535 306.19 31.5661ZM302.865 31.7861C302.865 30.1483 302.01 29.0972 300.054 29.0972H295.654V34.475H300.054C302.01 34.475 302.865 33.4239 302.865 31.7861Z" fill="white"/>
-<path d="M42.0687 35.7052C42.0687 47.3216 32.6513 56.7386 21.0344 56.7386C9.4174 56.7386 0 47.3216 0 35.7052C0 24.0888 9.4174 14.6719 21.0344 14.6719C32.6513 14.6719 42.0687 24.0888 42.0687 35.7052Z" fill="white"/>
-<path d="M64.1572 35.7052C64.1572 47.3216 58.1928 56.7386 50.8354 56.7386C43.478 56.7386 37.5137 47.3216 37.5137 35.7052C37.5137 24.0888 43.478 14.6719 50.8354 14.6719C58.1928 14.6719 64.1572 24.0888 64.1572 35.7052Z" fill="white"/>
-<path d="M76.7631 35.7052C76.7631 47.3216 73.467 56.7386 69.4011 56.7386C65.3352 56.7386 62.0391 47.3216 62.0391 35.7052C62.0391 24.0888 65.3352 14.6719 69.4011 14.6719C73.467 14.6719 76.7631 24.0888 76.7631 35.7052Z" fill="white"/>
-<path d="M83.0915 35.7052C83.0915 47.3216 81.208 56.7386 78.8846 56.7386C76.5612 56.7386 74.6777 47.3216 74.6777 35.7052C74.6777 24.0888 76.5612 14.6719 78.8846 14.6719C81.208 14.6719 83.0915 24.0888 83.0915 35.7052Z" fill="white"/>
-<path d="M325.112 13.4446C325.112 15.4696 326.754 17.1113 328.779 17.1113H335.501C335.839 17.1113 336.112 17.3849 336.112 17.7224C336.112 18.0599 335.839 18.3335 335.501 18.3335H328.779C326.754 18.3335 325.112 19.9752 325.112 22.0002V29.9447C325.112 30.2823 324.839 30.5559 324.501 30.5559C324.164 30.5559 323.89 30.2823 323.89 29.9447V22.0002C323.89 19.9752 322.249 18.3335 320.223 18.3335H312.279C311.941 18.3335 311.668 18.0599 311.668 17.7224C311.668 17.3849 311.941 17.1113 312.279 17.1113H320.223C322.249 17.1113 323.89 15.4696 323.89 13.4446V6.72229C323.89 6.38478 324.164 6.11117 324.501 6.11117C324.839 6.11117 325.112 6.38478 325.112 6.72229V13.4446Z" fill="white"/>
-<path d="M319.001 7.33341C319.001 9.35847 320.643 11.0001 322.668 11.0001H329.39C329.728 11.0001 330.001 11.2737 330.001 11.6112C330.001 11.9487 329.728 12.2223 329.39 12.2223H322.668C320.643 12.2223 319.001 13.864 319.001 15.889V23.8336C319.001 24.1711 318.728 24.4447 318.39 24.4447C318.053 24.4447 317.779 24.1711 317.779 23.8336V15.889C317.779 13.864 316.137 12.2223 314.112 12.2223H306.168C305.83 12.2223 305.557 11.9487 305.557 11.6112C305.557 11.2737 305.83 11.0001 306.168 11.0001H314.112C316.137 11.0001 317.779 9.35847 317.779 7.33341V0.611118C317.779 0.273607 318.053 0 318.39 0C318.728 0 319.001 0.273607 319.001 0.611117V7.33341Z" fill="white"/>
-</svg>
-</button>
-  <nav class="ext-links" aria-label="Links">
-    <a class="btn ext-btn" data-radius="7" href="https://drive.google.com/file/d/1VuHewja-pZzO5sXbg2FBLyKbe5iAdyyB/view" target="_blank" rel="noopener noreferrer"><span class="label" data-text="Resume">Resume</span><svg class="icon" width="20" height="20" viewBox="67 12 20 20" fill="none" aria-hidden="true"><path d="M72.0007 30.3307C71.5586 30.3307 71.1347 30.1551 70.8221 29.8426C70.5096 29.53 70.334 29.1061 70.334 28.6641V15.3307C70.334 14.8887 70.5096 14.4648 70.8221 14.1522C71.1347 13.8397 71.5586 13.6641 72.0007 13.6641H78.6673C78.9311 13.6636 79.1924 13.7154 79.4361 13.8164C79.6798 13.9173 79.9011 14.0655 80.0873 14.2524L83.0773 17.2424C83.2647 17.4287 83.4133 17.6502 83.5146 17.8942C83.6158 18.1382 83.6677 18.3999 83.6673 18.6641V28.6641C83.6673 29.1061 83.4917 29.53 83.1792 29.8426C82.8666 30.1551 82.4427 30.3307 82.0007 30.3307H72.0007Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M78.666 13.6641V17.8307C78.666 18.0517 78.7538 18.2637 78.9101 18.42C79.0664 18.5763 79.2783 18.6641 79.4993 18.6641H83.666" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M75.3327 19.5H73.666" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M80.3327 22.8359H73.666" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M80.3327 26.1641H73.666" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="badge" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#16264E"/><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" stroke="white"/><path d="M5.5 5.5H10.5V10.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10.5L10.5 5.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-    <a class="btn ext-btn" data-radius="7" href="https://shalak.framer.website/" target="_blank" rel="noopener noreferrer"><span class="label" data-text="Previous work">Previous work</span><svg class="icon" width="20" height="20" viewBox="104 12 20 20" fill="none" aria-hidden="true"><path d="M115.738 27.3399C115.583 27.4951 115.399 27.6183 115.197 27.7024C114.994 27.7865 114.777 27.8298 114.558 27.8299H108.166V21.4365C108.166 20.9945 108.342 20.5707 108.654 20.2582L113.791 15.1215C114.729 14.1833 116.002 13.6562 117.329 13.6562C118.655 13.6562 119.928 14.1833 120.866 15.1215C121.804 16.0597 122.331 17.3322 122.331 18.659C122.331 19.9859 121.804 21.2583 120.866 22.1965L115.738 27.3399Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M117.333 18.6641L105.666 30.3307" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M118.573 24.5H111.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="badge" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#16264E"/><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" stroke="white"/><path d="M5.5 5.5H10.5V10.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10.5L10.5 5.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-  </nav>
-</header>
+<section class="work" id="recent-work" aria-label="Recent work" tabindex="-1">
   <div class="content">
     <p class="section-label">Case study</p>
     <a class="case" href="#case-flowstate" aria-label="FlowState case study">
@@ -760,36 +756,31 @@
 <script>
 (function () {
   var body = document.body;
-  var landing = document.querySelector('.landing');
   var work = document.querySelector('.work');
+  var header = document.querySelector('.work-header');
+  var lockup = document.querySelector('.lockup');
   var backBtn = document.querySelector('.back-mark');
-  var track = document.querySelector('.track');
-
   var casePage = document.querySelector('.case-page');
   var caseLink = document.querySelector('.case');
   var caseBack = document.querySelector('.case-back');
+
+  // Header: invisible on the landing, fades in once the graphic has left the top edge, then stays pinned
+  function headerHeight() { document.documentElement.style.setProperty('--hh', header.offsetHeight + 'px'); }
+  function updateHeader() {
+    var on = lockup.getBoundingClientRect().bottom <= 0;
+    if (body.classList.contains('header-on') !== on) { body.classList.toggle('header-on', on); body.classList.toggle('at-work', on); }
+  }
+  headerHeight(); updateHeader();
+  window.addEventListener('scroll', updateHeader, { passive: true });
+  window.addEventListener('resize', function () { headerHeight(); updateHeader(); });
+  if (window.ResizeObserver) new ResizeObserver(headerHeight).observe(header);
+
+  backBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
   function afterSlide(el, target) {
     var done = function (e) { if (e && e.target !== el) return; target.focus({ preventScroll: true }); el.removeEventListener('transitionend', done); };
     el.addEventListener('transitionend', done);
   }
-  function push(state, hash) { try { history.pushState(state, '', hash); } catch (e) {} }
-
-  function show(atWork, fromHistory) {
-    if (body.classList.contains('at-work') === atWork) return;
-    body.classList.toggle('at-work', atWork);
-    landing.inert = atWork;
-    work.inert = !atWork;
-    if (!fromHistory) {
-      try {
-        if (atWork) push({ fold: 'work' }, '#recent-work');
-        else if (history.state && history.state.fold === 'work') history.back();
-        else history.replaceState(null, '', location.pathname + location.search);
-      } catch (e) {}
-    }
-    afterSlide(track, atWork ? work : landing);
-  }
-
   function showCase(open, fromHistory) {
     if (body.classList.contains('at-case') === open) return;
     body.classList.toggle('at-case', open);
@@ -797,49 +788,31 @@
     work.inert = open;
     if (open) casePage.scrollTop = 0;
     if (!fromHistory) {
-      if (open) push({ fold: 'case' }, '#case-flowstate');
+      if (open) { try { history.pushState({ fold: 'case' }, '', '#case-flowstate'); } catch (e) {} }
       else if (history.state && history.state.fold === 'case') { try { history.back(); } catch (e) {} }
     }
     afterSlide(casePage, open ? caseBack : caseLink);
   }
-
   document.querySelectorAll('.ext-btn').forEach(function (a) { a.addEventListener('click', function (e) { if (a.getAttribute('href').charAt(0) === '#') e.preventDefault(); }); });
   caseLink.addEventListener('click', function (e) { e.preventDefault(); showCase(true); });
   caseBack.addEventListener('click', function () { showCase(false); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && body.classList.contains('at-case')) showCase(false); });
-  window.__openWork = function () { show(true); };
-  window.__closeWork = function () { show(false); };
-  document.querySelector('.scroll-hint').addEventListener('click', function () { show(true); });
-  backBtn.addEventListener('click', function () { show(false); });
-  window.addEventListener('popstate', function () {
-    var h = location.hash;
-    if (h === '#case-flowstate') { show(true, true); showCase(true, true); }
-    else { showCase(false, true); show(h === '#recent-work', true); }
-  });
-  // Keep the real document from ever scrolling (focus can nudge it)
-  window.addEventListener('scroll', function () { window.scrollTo(0, 0); });
-  // The browser jumps to #recent-work / #case-flowstate on load or refresh by scrolling these
-  // clipped containers, which shoves the layout out of place and leaves the visible page inert.
-  // Pin them at 0 so only our transforms ever move anything.
-  [document.querySelector('.viewport'), track, landing].forEach(function (el) {
-    el.addEventListener('scroll', function () { if (el.scrollTop || el.scrollLeft) { el.scrollTop = 0; el.scrollLeft = 0; } });
-    el.scrollTop = 0; el.scrollLeft = 0;
-  });
-  try { history.scrollRestoration = 'manual'; } catch (e) {}
+  window.addEventListener('popstate', function () { showCase(location.hash === '#case-flowstate', true); });
 
-  // Refresh / open a link straight to the content page or the case study: show it immediately
-  // (no slide), and put the landing page underneath in history so Back still goes there.
+  // Opened or refreshed straight on the case study: show it at once, with the content page underneath
   (function restore() {
     var h = location.hash;
-    if (h !== '#recent-work' && h !== '#case-flowstate') return;
+    if (h === '#recent-work') { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} return; }
+    if (h !== '#case-flowstate') return;
     body.classList.add('no-anim');
     try {
       history.replaceState(null, '', location.pathname + location.search);
-      history.pushState({ fold: 'work' }, '', '#recent-work');
-      if (h === '#case-flowstate') history.pushState({ fold: 'case' }, '', '#case-flowstate');
+      history.pushState({ fold: 'case' }, '', '#case-flowstate');
     } catch (e) {}
-    show(true, true);
-    if (h === '#case-flowstate') showCase(true, true);
+    window.scrollTo(0, work.offsetTop);
+    updateHeader();
+    showCase(true, true);
+    void casePage.offsetWidth; void header.offsetWidth;
     requestAnimationFrame(function () { requestAnimationFrame(function () { body.classList.remove('no-anim'); }); });
   })();
 })();
@@ -976,108 +949,24 @@
 (function () {
   var work = document.querySelector('.work'), btn = document.querySelector('.to-top'), body = document.body;
   function update() {
-    var max = work.scrollHeight - work.clientHeight;
-    var past = max > 0 && work.scrollTop / max >= 0.25;      // 25% of the way down, and below
-    var on = past && body.classList.contains('at-work') && !body.classList.contains('at-case');
+    var max = work.offsetTop + work.offsetHeight - innerHeight - work.offsetTop;
+    var y = window.scrollY - work.offsetTop;
+    var past = max > 0 && y / max >= 0.25;      // 25% of the way down the content page, and below
+    var on = past && !body.classList.contains('at-case');
     btn.classList.toggle('show', on);
     btn.tabIndex = on ? 0 : -1;
     btn.setAttribute('aria-hidden', on ? 'false' : 'true');
   }
-  work.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('scroll', update, { passive: true });
   new MutationObserver(update).observe(body, { attributes: true, attributeFilter: ['class'] });
   window.addEventListener('resize', update);
   btn.addEventListener('click', function () {
-    work.scrollTo({ top: 0, behavior: 'smooth' });
-    var mark = document.querySelector('.back-mark'); if (mark) mark.focus({ preventScroll: true });
+    window.scrollTo({ top: work.offsetTop, behavior: 'smooth' });
   });
   update();
 })();
 </script>
-<script>
-/* Scroll / swipe / keys: landing -> content page, and back up again from the top of the content page */
-(function () {
-  var body = document.body, landing = document.querySelector('.landing'), work = document.querySelector('.work');
-  var LOCK_MS = 1200;            // slide (900ms) + a little, so trackpad momentum can't double-fire
-  var lockedUntil = 0, acc = 0, accTimer = null;
-  // Content page -> landing (tuned on a real Mac trackpad log).
-  // The browser can't see a finger touch down, so a NEW flick is recognised by its shape:
-  // momentum only ever fades, while a new flick starts after a pause or with a jump in speed.
-  // Only a flick that STARTS at the very top goes back; one that starts lower down
-  // stops at the top and the rest of it (momentum included) is ignored.
-  var NEW_GAP_MS = 60;           // a pause this long between events = new flick
-  var RISE_PX = 10;              // speed jumping up by this much after fading = new flick
-  var BACK_PX = 40;              // up-scroll needed within a from-the-top flick
-  var lastWheel = 0, peak = 0, trough = 0, fromTop = false, upAcc = 0;
-  function px(e) { return e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * innerHeight : e.deltaY; }
-  var lightbox = document.querySelector('.lightbox');
-  function onContentTop() {
-    return body.classList.contains('at-work') && !body.classList.contains('at-case') && !(lightbox && !lightbox.hidden);
-  }
-  function back() {
-    if (Date.now() < lockedUntil || !onContentTop()) return;
-    lockedUntil = Date.now() + LOCK_MS; upAcc = 0; acc = 0;
-    window.__closeWork();            // same slide, in reverse
-  }
-  function onLanding() { return !body.classList.contains('at-work') && !body.classList.contains('at-case'); }
-  function go() {
-    if (Date.now() < lockedUntil || !onLanding()) return;
-    lockedUntil = Date.now() + LOCK_MS; acc = 0;
-    window.__openWork();             // reuse the exact same transition + history behaviour
-  }
-  // mouse wheel / trackpad: add up small deltas so a gentle two-finger scroll still counts
-  window.addEventListener('wheel', function (e) {
-    if (onLanding()) {
-      e.preventDefault();
-      if (e.deltaY > 0) { acc += e.deltaY; clearTimeout(accTimer); accTimer = setTimeout(function () { acc = 0; }, 200); if (acc > 30) go(); }
-      return;
-    }
-    // just arrived: swallow leftover momentum so the content page doesn't jump
-    if (Date.now() < lockedUntil) { e.preventDefault(); lastWheel = Date.now(); return; }
-    var now = performance.now(), gap = now - lastWheel, dy = px(e), a = Math.abs(dy);
-    lastWheel = now;
-    if (!onContentTop() || e.ctrlKey) { fromTop = false; return; }
-    var atTop = work.scrollTop < 1;
-    if (gap >= NEW_GAP_MS || (a - trough >= RISE_PX && trough <= peak * 0.5)) {
-      peak = trough = a; fromTop = atTop; upAcc = 0;          // a new flick begins here
-    } else if (a > peak) { peak = trough = a; }
-    else if (a < trough) { trough = a; }
-    if (fromTop && atTop && dy < 0) {
-      e.preventDefault();
-      upAcc -= dy;
-      if (upAcc >= BACK_PX) { fromTop = false; back(); }
-    }
-  }, { passive: false });
-  // touch: swipe up on the landing page
-  var startY = null;
-  landing.addEventListener('touchstart', function (e) { startY = e.touches[0].clientY; }, { passive: true });
-  landing.addEventListener('touchmove', function (e) {
-    if (startY === null || !onLanding()) return;
-    if (startY - e.touches[0].clientY > 40) { startY = null; go(); }
-  }, { passive: true });
-  landing.addEventListener('touchend', function () { startY = null; }, { passive: true });
-  // touch: on the content page, a new downward swipe that starts at the very top goes back
-  var wStartY = null;
-  work.addEventListener('touchstart', function (e) { wStartY = (onContentTop() && work.scrollTop <= 0) ? e.touches[0].clientY : null; }, { passive: true });
-  work.addEventListener('touchmove', function (e) {
-    if (Date.now() < lockedUntil) { e.preventDefault(); return; }
-    if (wStartY === null) return;
-    var dy = e.touches[0].clientY - wStartY;
-    if (dy > 0 && work.scrollTop <= 0) { e.preventDefault(); if (dy > 40) { wStartY = null; back(); } }
-    else if (dy < 0) wStartY = null;    // they're scrolling down into the feed
-  }, { passive: false });
-  work.addEventListener('touchend', function () { wStartY = null; }, { passive: true });
-  // keyboard
-  document.addEventListener('keydown', function (e) {
-    if (onContentTop() && !e.repeat && (e.key === 'ArrowUp' || e.key === 'PageUp') && work.scrollTop <= 0) {
-      if (e.target.closest && e.target.closest('input, textarea, [contenteditable]')) return;
-      e.preventDefault(); back(); return;
-    }
-    if (!onLanding()) return;
-    if (e.target.closest && e.target.closest('input, textarea, [contenteditable]')) return;
-    if (e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A')) { e.preventDefault(); go(); }
-  });
-})();
-</script>
+
 
 <script>
 /* Videos: start every autoplay video whenever it's on screen and pause it when it isn't.
