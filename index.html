@@ -13,16 +13,24 @@
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Shalak Bhavsar, Product Designer</title>
-<meta name="description" content="Shalak Bhavsar is a product designer. Built products for Healthcare, Automotive, Cyber Security and Ed-Tech; now building products with distinct personalities.">
+<meta name="description" content="Shalak Bhavsar is a product designer with 3 years across healthcare, automotive, cyber security and ed-tech, now building products with personality.">
 <meta name="theme-color" content="#16264E">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Shalak Bhavsar, Product Designer">
-<meta property="og:description" content="Built products for Healthcare, Automotive, Cyber Security and Ed-Tech. Now I build products with distinct personalities.">
-<meta property="og:image" content="assets/og-image.png">
+<meta property="og:description" content="3 years designing for healthcare, automotive, cyber security and ed-tech. Now building products with personality.">
+<meta property="og:url" content="https://shalak.vercel.app/">
+<meta property="og:image" content="https://shalak.vercel.app/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Shalak Bhavsar, Product Designer">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@Shalakkkk">
+<meta name="twitter:title" content="Shalak Bhavsar, Product Designer">
+<meta name="twitter:description" content="3 years designing for healthcare, automotive, cyber security and ed-tech. Now building products with personality.">
+<meta name="twitter:image" content="https://shalak.vercel.app/assets/og-image.png">
+<link rel="canonical" href="https://shalak.vercel.app/">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,7 +68,7 @@
   /* No focus outlines anywhere (keyboard rings intentionally off) */
   *:focus, *:focus-visible { outline: none !important; }
   .landing { position: relative; }
-  /* Quiet hint that there's more below (decoration only) */
+  /* Quiet hint that there's more below; tap/click scrolls to the work (scrolling itself is unchanged) */
   .scroll-hint {
     position: absolute;
     left: 50%;
@@ -70,11 +78,12 @@
     display: flex; align-items: center; justify-content: center;
     padding: 0; border: 0; background: none;
     color: var(--fg);
-    pointer-events: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
     transition: opacity .2s ease;
   }
   /* gone on the same trigger as the header fading in */
-  body.header-on .scroll-hint { opacity: 0; }
+  body.header-on .scroll-hint { opacity: 0; pointer-events: none; }
   .scroll-hint svg { width: 16px; height: 16px; display: block; animation: hint-bob 2.4s ease-in-out infinite; }
   .scroll-hint:focus { outline: none; }
   .scroll-hint:focus-visible { outline: 2px solid var(--fg); outline-offset: 0; }
@@ -84,6 +93,8 @@
   .lockup { --u: 1px; display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 16); color: #fff; }
   .lockup svg { display: block; width: auto; flex: none; }
   .lk-row { display: flex; align-items: center; }
+  .hero { display: flex; flex-direction: column; align-items: center; }
+  .hero-line { margin: 32px 0 0; max-width: 340px; text-align: center; font-size: 15px; line-height: 1.5; opacity: .8; text-wrap: balance; }
   .lk-title { gap: calc(var(--u) * 10); }
   .lk-icons { gap: calc(var(--u) * 24); }
   .lk-seal { gap: calc(var(--u) * 16); margin-top: calc(var(--u) * 4); }
@@ -262,9 +273,16 @@
   body.at-case .case-page { transform: translateX(0); }
   /* the content page drifts left a little underneath, like opening a detail view */
   body.at-case .track, body.at-case .work-header { transform: translateX(-24%); filter: brightness(0.7); }
+  .case-bar { position: sticky; top: 0; z-index: 1; padding: 24px 24px 0; pointer-events: none; }
+  .case-bar > * { pointer-events: auto; }
+  /* narrower screens: the text column reaches the button, so the bar gets the page colour + blur and text scrolls under it */
+  @media (max-width: 900px) {
+    .case-bar { padding: 12px 16px; background: rgba(22, 38, 78, .82); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+    .case-bar + .case-body { padding-top: 16px; }
+  }
   .case-back {
-    position: sticky; top: 24px; left: 24px;
-    margin: 24px 0 0 24px;
+    position: relative;
+    margin: 0;
     display: inline-grid; place-items: center;
     width: 36px; height: 36px;
     border: 1px solid var(--fg); border-radius: 50%;
@@ -333,12 +351,16 @@
     .scroll-hint { bottom: calc(81px + env(safe-area-inset-bottom, 0px)); }
     .scroll-hint svg { width: 14px; height: 14px; }
     .lockup { --u: calc(min(1px, calc((100vw - 32px) / 380)) * .85); }
+    .hero-line { margin-top: 24px; max-width: 300px; font-size: 13px; }
     .btn { height: 32px; gap: 10px; padding: 0 10px 0 11px; }
     .btn .arrow { width: 12px; height: 12px; }
     .btn .label { transform: translateY(-0.7px); }
     .back-mark { width: calc((100vw - 32px) * 0.5 * 336 / 448 * 1.25 * 1.15); }
     .content { padding-top: 40px; }
-    .work-header { padding: 24px 16px 0; }
+    .work-header { padding: 16px 16px 0; padding-bottom: 12px !important; flex-wrap: nowrap; }
+    .ext-links { gap: 12px; padding-top: 0; flex: none; }
+    .ext-links .btn.ext-btn { width: 36px; padding: 0; justify-content: center; }
+    .ext-links .btn.ext-btn .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     /* Phones: buttons back at the full Figma size (36px tall, 13px text, 20px icon, 16px badge) */
     .btn.ext-btn { height: 36px; gap: 4px; padding: 0 15px 0 13px; font-size: 13px; }
     .btn.ext-btn.cs-cta { padding: 0 15px 0 14px; }
@@ -363,7 +385,6 @@
     .to-top { right: 16px; bottom: 16px; }
     /* phones: show wide images at a readable height and swipe sideways */
     .lightbox { padding: 64px 12px 24px; }
-    .case-back { top: 16px; margin: 16px 0 0 16px; }
     .cs-head h1 { font-size: 24px; }
     .cs-section { margin-top: 56px; }
     .cs-section p { font-size: 15px; }
@@ -436,6 +457,7 @@
 <div class="viewport">
 <div class="track">
 <main class="landing" id="top" tabindex="-1">
+<div class="hero">
 <div class="lockup" role="img" aria-label="Shalak Bhavsar, Product Designer. 3 years across healthcare, automotive, cyber security and ed-tech. Now building products with personality.">
 <svg class="lk-logo" aria-hidden="true" focusable="false" style="height:calc(var(--u) * 40)" viewBox="0 0 46 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M43.0059 0.5C42.9897 0.5 43.0305 0.490101 43.1318 0.59375C43.2339 0.698279 43.3569 0.879413 43.4883 1.15723C43.7499 1.71077 43.9991 2.54344 44.2129 3.6123C44.639 5.74287 44.9053 8.70894 44.9053 12C44.9053 15.2911 44.639 18.2571 44.2129 20.3877C43.9991 21.4566 43.7499 22.2892 43.4883 22.8428C43.3569 23.1206 43.2339 23.3017 43.1318 23.4062C43.0305 23.5099 42.9897 23.5 43.0059 23.5C43.0212 23.5001 42.9806 23.5093 42.8799 23.4062C42.7778 23.3018 42.6549 23.1208 42.5234 22.8428C42.2618 22.2892 42.0127 21.4566 41.7988 20.3877C41.3727 18.2571 41.1055 15.2911 41.1055 12C41.1055 8.70894 41.3727 5.74287 41.7988 3.6123C42.0127 2.54336 42.2618 1.71075 42.5234 1.15723C42.6549 0.879169 42.7778 0.698237 42.8799 0.59375C42.9806 0.490703 43.0212 0.499885 43.0059 0.5Z" fill="#16264E" stroke="white"/>
@@ -576,7 +598,9 @@
 <path d="M1 5.99532C1 4.03959 2.38391 2.34633 4.31238 2.02086C12.5979 0.622491 18.3747 0.690983 26.6475 2.04085C28.5935 2.35837 30 4.05931 30 6.03101V18.2389C30 20.2997 28.4656 22.0442 26.4193 22.2882C17.9938 23.2929 12.3123 23.5925 4.36221 22.4078C2.40972 22.1169 1 20.4114 1 18.4373V5.99532Z" stroke="white" stroke-width="2" mask="url(#path-1-outside-1_1108_26073)"/>
 </svg></div>
 </div>
-<div class="scroll-hint" aria-hidden="true"><svg viewBox="954 718 14 14" fill="none" aria-hidden="true"><path d="M961 719.617V731.284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M966.833 725.453L960.999 731.286L955.166 725.453" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+<p class="hero-line">I design products with personality. Based in Pune, looking for an early‑stage team in Bengaluru to build with.</p>
+</div>
+<button class="scroll-hint" type="button" aria-label="Scroll to recent work"><svg viewBox="954 718 14 14" fill="none" aria-hidden="true"><path d="M961 719.617V731.284" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M966.833 725.453L960.999 731.286L955.166 725.453" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 </main>
 <section class="work" id="recent-work" aria-label="Recent work" tabindex="-1">
   <div class="content">
@@ -595,6 +619,15 @@
       <li class="post">
         <div class="avatar" aria-hidden="true"></div>
         <div>
+          <div class="post-head"><span class="post-name">Shalak Bhavsar</span><span class="post-handle">@Shalakkkk</span><span class="post-date">· <time datetime="2026-02-12">Feb 12</time></span></div>
+          <p class="post-text">Check it out: <a class="post-inline-link" href="https://pomodorobyshalak.lovable.app" target="_blank" rel="noopener noreferrer">pomodorobyshalak.lovable.app</a></p>
+          <div class="post-media has-media" style="aspect-ratio: 1280 / 720"><video poster="assets/pomodoro-demo-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="Picking up a phone from a desk and opening the Pomodoro app"><source src="assets/pomodoro-demo.webm" type="video/webm"><source src="assets/pomodoro-demo.mp4" type="video/mp4"></video></div>
+          <a class="post-link" href="https://x.com/Shalakkkk/status/2021960982151803368" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> View on X</a>
+        </div>
+      </li>
+      <li class="post">
+        <div class="avatar" aria-hidden="true"></div>
+        <div>
           <div class="post-head"><span class="post-name">Shalak Bhavsar</span><span class="post-handle">@Shalakkkk</span><span class="post-date">· <time datetime="2026-09-23">Sep 23</time></span></div>
           <p class="post-text">Why click a button to deploy when you can deploy by petting a dog?</p>
           <div class="post-media has-media" style="aspect-ratio: 1280 / 894"><video poster="assets/deploy-dog-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="Deploy dialog where you pet a dog to deploy and a cat to cancel"><source src="assets/deploy-dog.webm" type="video/webm"><source src="assets/deploy-dog.mp4" type="video/mp4"></video></div>
@@ -605,7 +638,7 @@
         <div class="avatar" aria-hidden="true"></div>
         <div>
           <div class="post-head"><span class="post-name">Shalak Bhavsar</span><span class="post-handle">@Shalakkkk</span><span class="post-date">· <time datetime="2026-09-21">Sep 21</time></span></div>
-          <p class="post-text">Accordion stack Inspired from this beautiful lamp I saw</p>
+          <p class="post-text">Accordion stack, inspired by this beautiful lamp I saw</p>
           <div class="post-media has-media" style="aspect-ratio: 1280 / 868"><video poster="assets/accordion-lamp-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="A real slatted orange pendant lamp next to an accordion-stack interface inspired by it"><source src="assets/accordion-lamp.webm" type="video/webm"><source src="assets/accordion-lamp.mp4" type="video/mp4"></video></div>
           <a class="post-link" href="https://x.com/Shalakkkk/status/2102086424829051046" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> View on X</a>
         </div>
@@ -640,15 +673,6 @@
       <li class="post">
         <div class="avatar" aria-hidden="true"></div>
         <div>
-          <div class="post-head"><span class="post-name">Shalak Bhavsar</span><span class="post-handle">@Shalakkkk</span><span class="post-date">· <time datetime="2026-02-12">Feb 12</time></span></div>
-          <p class="post-text">Chek it out : <a class="post-inline-link" href="https://pomodorobyshalak.lovable.app" target="_blank" rel="noopener noreferrer">pomodorobyshalak.lovable.app</a></p>
-          <div class="post-media has-media" style="aspect-ratio: 1280 / 720"><video poster="assets/pomodoro-demo-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="Picking up a phone from a desk and opening the Pomodoro app"><source src="assets/pomodoro-demo.webm" type="video/webm"><source src="assets/pomodoro-demo.mp4" type="video/mp4"></video></div>
-          <a class="post-link" href="https://x.com/Shalakkkk/status/2021960982151803368" target="_blank" rel="noopener noreferrer"><svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> View on X</a>
-        </div>
-      </li>
-      <li class="post">
-        <div class="avatar" aria-hidden="true"></div>
-        <div>
           <div class="post-head"><span class="post-name">Shalak Bhavsar</span><span class="post-handle">@Shalakkkk</span><span class="post-date">· <time datetime="2025-11-25">Nov 25, 2025</time></span></div>
           <p class="post-text">Building in… Public?</p>
           <div class="post-media has-media" style="aspect-ratio: 1400 / 1001"><img src="assets/building-in-public.webp" width="1400" height="1001" loading="lazy" alt="Hand-drawn wireframes of a Pomodoro app: timers, task lists and work-session screens"></div>
@@ -664,12 +688,14 @@
 </div>
 
 <article class="case-page" id="case-flowstate" aria-label="FlowState case study" inert>
+  <div class="case-bar">
   <button class="case-back" type="button" aria-label="Back to recent work">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H3M7.5 3.5 3 8l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
+  </div>
   <div class="case-body">
     <header class="cs-head">
-      <h1>Building a Saas for people who build SaaS?</h1>
+      <h1>Building a SaaS for people who build SaaS?</h1>
       <dl class="cs-meta">
         <div><dt>Date</dt><dd>2026</dd></div>
         <div><dt>Service</dt><dd>Product Design, Vibe Coding</dd></div>
@@ -680,7 +706,7 @@
 
     <section class="cs-section">
       <h2>Overview</h2>
-      <p>Pomodoro was created by Francesco Cirillo in the late 1980s for studying. You set a 25-minute timer and start. It worked well in a university setup, because Francesco had a pre-defined structure for tasks: A chapter, a problem set, a topic.</p>
+      <p>Pomodoro was created by Francesco Cirillo in the late 1980s for studying. You set a 25-minute timer and start. It worked well in a university setup, because Francesco had a predefined structure for tasks: a chapter, a problem set, a topic.</p>
     </section>
 
     <section class="cs-section">
@@ -692,7 +718,7 @@
 
     <section class="cs-section">
       <h2>How Can We Solve This?</h2>
-      <p>To bring back that structure back into product work, people need an easy way to decide what they want to get done when they start their session.</p>
+      <p>To bring that structure back into product work, people need an easy way to decide what they want to get done when they start their session.</p>
       <p>If we make it very easy for people to quickly pick what they want to do right before starting their pomodoro, we can make pomodoro a lot more useful for product work.</p>
       <figure class="cs-media has-media" style="aspect-ratio: 1400 / 637"><img src="assets/cs-solution.webp" width="1400" height="637" loading="lazy" alt="A notebook of task lists plus a phone timer set to 25 minutes, joined by a plus sign"></figure>
     </section>
@@ -700,31 +726,31 @@
     <section class="cs-section">
       <h2>Intervention</h2>
       <p class="cs-flow">Choose a pomodoro <span aria-hidden="true">→</span> Choose tasks to finish <span aria-hidden="true">→</span> Start the session</p>
-      <p>Having your tasks right there when you start a timer makes it really easy to do the most important task: Deciding what to do.</p>
+      <p>Having your tasks right there when you start a timer makes it really easy to do the most important task: deciding what to do.</p>
       <p>So I built a PWA on Lovable.</p>
       <figure class="cs-media has-media" style="aspect-ratio: 1280 / 774"><video poster="assets/pwa-demo-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="Product demo: choosing a pomodoro, picking tasks and starting the session in the PWA"><source src="assets/pwa-demo.webm" type="video/webm"><source src="assets/pwa-demo.mp4" type="video/mp4"></video></figure>
       <a class="btn ext-btn cs-cta" data-radius="7" href="https://shalakmakesyouproductive.lovable.app/" target="_blank" rel="noopener noreferrer"><span class="label" data-text="Check it out">Check it out</span><span class="badge" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#16264E"/><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" stroke="white"/><path d="M5.5 5.5H10.5V10.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10.5L10.5 5.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
     </section>
 
     <section class="cs-section">
-      <h2>Long-Term Benefits</h2>
-      <p>This small change of habit when doing pomodoro reinforces your relationship between effort and intention. Do this a couple of times, it makes you aware of how much you can get done in just 25 minutes.</p>
-      <p>It helps you differentiate between high-impact work, and low-impact work, and helps your prioritise how you can do more of things that matter more to you.</p>
+      <h2>Exploration</h2>
+      <p>While building this, I explored an interaction that mimics turning a physical knob to set a timer. I couldn’t include it in the final product because I wanted the pomodoros in pairs, but it was fun to build and show friends!</p>
+      <figure class="cs-media has-media" style="aspect-ratio: 1280 / 720"><video poster="assets/pomodoro-demo-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="Knob interaction prototype on a phone"><source src="assets/pomodoro-demo.webm" type="video/webm"><source src="assets/pomodoro-demo.mp4" type="video/mp4"></video></figure>
+      <a class="btn ext-btn cs-cta" data-radius="7" href="https://pomodorobyshalak.lovable.app/" target="_blank" rel="noopener noreferrer"><span class="label" data-text="Check it out">Check it out</span><span class="badge" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#16264E"/><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" stroke="white"/><path d="M5.5 5.5H10.5V10.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10.5L10.5 5.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+      <p class="cs-note">Note: this version only works on your phone! If you want to give it a try, scan the QR code below 👇</p>
+      <figure class="cs-media has-media cs-qr" style="aspect-ratio: 1 / 1; background: #fff; padding: 12px;"><img src="assets/cs-qr.png" width="600" height="600" loading="lazy" alt="QR code to open the knob prototype on your phone"></figure>
     </section>
 
     <section class="cs-section">
-      <h2>Exploration</h2>
-      <p>While building this, I explored and idea of an interaction which mimics turning a physical knob to set a timer. I could not include this in the final product, because I wanted the pomodoros to be in a pair of 2, but if was fun to build and show friends!</p>
-      <figure class="cs-media has-media" style="aspect-ratio: 1280 / 720"><video poster="assets/pomodoro-demo-poster.jpg" autoplay muted loop playsinline preload="auto" aria-label="Knob interaction prototype on a phone"><source src="assets/pomodoro-demo.webm" type="video/webm"><source src="assets/pomodoro-demo.mp4" type="video/mp4"></video></figure>
-      <a class="btn ext-btn cs-cta" data-radius="7" href="https://pomodorobyshalak.lovable.app/" target="_blank" rel="noopener noreferrer"><span class="label" data-text="Check it out">Check it out</span><span class="badge" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#16264E"/><rect x="0.5" y="0.5" width="15" height="15" rx="3.5" stroke="white"/><path d="M5.5 5.5H10.5V10.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 10.5L10.5 5.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-      <p class="cs-note">Note - This version only works on your phone! if you want to give it a try, scan this QR code below👇</p>
-      <figure class="cs-media has-media cs-qr" style="aspect-ratio: 1 / 1; background: #fff; padding: 12px;"><img src="assets/cs-qr.png" width="600" height="600" loading="lazy" alt="QR code to open the knob prototype on your phone"></figure>
+      <h2>Long-Term Benefits</h2>
+      <p>This small change in habit reinforces the link between effort and intention. Do it a few times and you start to see how much you can get done in just 25 minutes.</p>
+      <p>It helps you tell high-impact work from low-impact work, and helps you prioritise doing more of the things that matter to you.</p>
     </section>
 
     <section class="cs-contact">
       <h2>Get in touch!</h2>
       <p>Let’s build something together.</p>
-      <p class="cs-contact-links"><a href="mailto:shalak.design@gmail.com">shalak.design@gmail.com</a></p>
+      <p class="cs-contact-links"><a href="mailto:shalak.design@gmail.com">shalak.design@gmail.com</a><a href="https://drive.google.com/file/d/1VuHewja-pZzO5sXbg2FBLyKbe5iAdyyB/view" target="_blank" rel="noopener noreferrer">Resume</a></p>
     </section>
   </div>
 </article>
@@ -820,6 +846,7 @@
   if (window.ResizeObserver) new ResizeObserver(headerHeight).observe(header);
 
   backBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  document.querySelector('.scroll-hint').addEventListener('click', function () { window.scrollTo({ top: work.offsetTop, behavior: 'smooth' }); });
 
   function afterSlide(el, target) {
     var done = function (e) { if (e && e.target !== el) return; target.focus({ preventScroll: true }); el.removeEventListener('transitionend', done); };
